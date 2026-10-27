@@ -1,0 +1,75 @@
+name: Build and publish PhotoCraft Web
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Vérifie et reconstruit l'image chaque semaine
+    - cron: "0 3 * * 1"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/publish-image.yml"
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout packaging repository
+        uses: actions/checkout@v4
+
+      - name: Checkout official PhotoCraft source
+        uses: actions/checkout@v4
+        with:
+          repository: storytold/photocraft
+          path: photocraft-src
+
+      - name: Set lowercase image name
+        id: image
+        run: |
+          echo "name=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/photocraft-web" >> "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.image.outputs.name }}
+          tags: |
+            type=raw,value=latest
+            type=sha,format=short
+
+      - name: Build and publish image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./photocraft-src
+          file: ./photocraft-src/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            PHOTOCRAFT_BUILD_SHA=${{ github.sha }}
+            PHOTOCRAFT_BUILD_DATE=${{ github.run_id }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
