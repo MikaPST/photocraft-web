@@ -1,0 +1,7 @@
+services:
+  photocraft-web:
+    image: ghcr.io/mikapst/photocraft-web:latest
+    container_name: photocraft-web
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
