@@ -1,11 +1,27 @@
-# PhotoCraft Web — Docker Image
+<p align="center">
+  <img src="https://raw.githubusercontent.com/storytold/photocraft/main/assets/app-icon/hicolor/256x256/apps/ai.storyteller.photocraft.png" width="128" height="128" alt="PhotoCraft application icon">
+</p>
 
-[![Build and publish PhotoCraft Web](https://github.com/MikaPST/photocraft-web/actions/workflows/publish-image.yml/badge.svg)](https://github.com/MikaPST/photocraft-web/actions/workflows/publish-image.yml)
-[![Docker Image](https://ghcr-badge.egpl.dev/mikapst/photocraft-web/latest_tag?trim=major&label=GHCR)](https://github.com/MikaPST/photocraft-web/pkgs/container/photocraft-web)
+<h1 align="center">PhotoCraft Web — Docker Image</h1>
 
-A community-maintained Docker image for **[PhotoCraft](https://github.com/storytold/photocraft)**, providing its browser-based image editor through a self-hosted web interface.
+<p align="center">
+  A community-maintained Docker image for
+  <a href="https://github.com/storytold/photocraft">PhotoCraft</a>,
+  providing its browser-based image editor through a self-hosted web interface.
+  <br>
+  Build automation and image publication to GitHub Container Registry (GHCR).
+</p>
 
-This repository automates the build and publication of the Docker image to GitHub Container Registry (GHCR), making PhotoCraft Web easier to deploy on Unraid and other Docker-compatible platforms.
+<p align="center">
+  <a href="https://github.com/MikaPST/photocraft-web/actions/workflows/publish-image.yml">
+    <img src="https://github.com/MikaPST/photocraft-web/actions/workflows/publish-image.yml/badge.svg" alt="Build and publish PhotoCraft Web">
+  </a>
+  <a href="https://github.com/MikaPST/photocraft-web/pkgs/container/photocraft-web">
+    <img src="https://ghcr-badge.egpl.dev/mikapst/photocraft-web/latest_tag?trim=major&label=GHCR" alt="GHCR image tag">
+  </a>
+</p>
+
+---
 
 ## Why this repository?
 
@@ -84,7 +100,8 @@ Each successful build publishes:
 
 The build targets `linux/amd64` and `linux/arm64`. Actual compatibility depends on the upstream build and the target platform.
 
-**Important:** a weekly build does not guarantee that upstream changes are compatible or stable. PhotoCraft is under active development and is currently described by its maintainers as an early-alpha project. Test new images before relying on them for important work.
+> [!IMPORTANT]
+> A weekly build does not guarantee that upstream changes are compatible or stable. PhotoCraft is under active development and is currently described by its maintainers as an early-alpha project. Test new images before relying on them for important work.
 
 The `latest` tag is mutable and may point to a newer image after a successful build.
 
