@@ -3,7 +3,6 @@
 </p>
 
 <h1 align="center">PhotoCraft Web — Docker Image</h1>
-
 <p align="center">
   A community-maintained Docker image for
   <a href="https://github.com/storytold/photocraft">PhotoCraft</a>,
@@ -11,7 +10,6 @@
   <br>
   Build automation and image publication to GitHub Container Registry (GHCR).
 </p>
-
 <p align="center">
   <a href="https://github.com/MikaPST/photocraft-web/actions/workflows/publish-image.yml">
     <img src="https://github.com/MikaPST/photocraft-web/actions/workflows/publish-image.yml/badge.svg" alt="Build and publish PhotoCraft Web">
@@ -31,10 +29,10 @@
 The official PhotoCraft project provides a WebAssembly-based version that can be hosted as a static website. This repository packages the web application into a Docker image to simplify self-hosting.
 
 The goals are to:
-
 - Build the PhotoCraft Web application from the upstream source code.
 - Publish a ready-to-run Docker image to GHCR.
-- Automatically rebuild the image every week to incorporate upstream changes.
+- Automatically build a versioned image when a new official PhotoCraft release is published.
+- Publish a matching GitHub Release in this repository, using the official version and release notes.
 - Provide a convenient deployment option for Unraid Community Applications.
 - Offer a simple Docker Compose configuration for users who prefer managing containers with Compose.
 - Keep the packaging and deployment configuration separate from the upstream PhotoCraft project.
@@ -44,7 +42,6 @@ This is a packaging and distribution project, not a fork intended to develop a s
 ## How it works
 
 PhotoCraft Web runs directly in the user's browser using WebAssembly. The Docker container serves the static web application through NGINX; it does not provide a remote Linux desktop.
-
 - **Browser-based interface:** access the editor through a web browser.
 - **Local file selection:** opening a file uses the browser's file picker.
 - **Browser downloads:** saving and exporting documents uses the browser's download mechanism.
@@ -59,6 +56,12 @@ The image is published to GitHub Container Registry:
 
 ```text
 ghcr.io/mikapst/photocraft-web:latest
+```
+
+Each upstream PhotoCraft release is also published as a matching version tag. For example:
+
+```text
+ghcr.io/mikapst/photocraft-web:v0.20.2
 ```
 
 ### Option 1 — Docker Compose (recommended)
@@ -135,32 +138,37 @@ Do not expose an unencrypted HTTP port directly to the public Internet. Restrict
 
 ## Automated builds
 
-GitHub Actions builds and publishes the image automatically.
+GitHub Actions checks the official PhotoCraft repository for new published releases.
 
 | Trigger | Behaviour |
 |---|---|
-| Weekly schedule | Rebuilds from the upstream `main` branch |
-| Manual workflow dispatch | Allows a build to be triggered manually |
-| Workflow changes on `main` | Triggers a build when the workflow file changes |
+| Weekly schedule | Checks the latest official PhotoCraft release and builds it if it has not already been published here |
+| Manual workflow dispatch | Builds the latest official release, or a specific upstream tag when provided |
+| Force rebuild | Rebuilds an already published upstream version and updates its MikaPST Release |
+| Workflow changes on `main` | Rebuilds the latest official upstream release using the updated packaging workflow |
 
-Each successful build publishes:
+Each successful build publishes the following GHCR tags:
 
-- `latest` — the most recently published image.
-- `sha-<commit>` — a build-specific tag for identifying an image.
+- `latest` — the most recently packaged official PhotoCraft release.
+- `<upstream-version>` — the exact upstream release tag, for example `v0.20.2`.
+- `upstream-<commit>` — the exact upstream source commit used for the image.
 
-The build targets `linux/amd64` and `linux/arm64`. Actual compatibility depends on the upstream build and the target platform.
+The build targets `linux/amd64` and `linux/arm64`. It checks out the official PhotoCraft source at the release tag and uses the Dockerfile and web packaging configuration supplied by that upstream version.
+
+After the image is successfully built and pushed, this repository creates or updates a GitHub Release with the same version tag. The MikaPST Release includes the upstream release notes, a link to the official release, the upstream commit, supported Docker platforms, image tags and image digest.
+
+The workflow is idempotent: scheduled and ordinary manual runs skip a version that already has a Release in this repository. A manual run can force a rebuild when needed. Changes pushed to the packaging workflow trigger a rebuild of the current latest upstream release.
 
 > [!IMPORTANT]
-> A weekly build does not guarantee that upstream changes are compatible or stable. PhotoCraft is under active development and is currently described by its maintainers as an early-alpha project. Test new images before relying on them for important work.
+> A new upstream release is not published to GHCR until its Docker build and multi-platform push have succeeded. The `latest` tag is mutable; use an explicit version tag when you need to keep a deployment on a specific PhotoCraft release.
 
-The `latest` tag is mutable and may point to a newer image after a successful build.
+PhotoCraft is under active development. Test new images before relying on them for important work.
 
 ## Unraid Community Applications
 
 This image is intended to be distributed through the maintainer's existing Unraid Community Applications repository.
 
 The Unraid template references the published GHCR image and provides configuration for the web port and resource limits.
-
 - **Unraid Community Applications repository:** [MikaPST/unraid-community-apps](https://github.com/MikaPST/unraid-community-apps)
 - **PhotoCraft Web template:** [photocraft-web.xml](https://github.com/MikaPST/unraid-community-apps/blob/main/templates/photocraft-web.xml)
 
@@ -169,20 +177,18 @@ This repository contains the image build, publication workflow and Docker Compos
 ## Upstream project
 
 PhotoCraft is an open-source image editor developed by the ArtCraft Team and its contributors.
-
 - **Source code:** [storytold/photocraft](https://github.com/storytold/photocraft)
 - **Official website:** [getartcraft.com/apps/photocraft](https://getartcraft.com/apps/photocraft)
 - **Official web hosting guide:** [Docker web hosting](https://github.com/storytold/photocraft/blob/main/packaging/web/README.md)
 - **Official releases:** [PhotoCraft releases](https://github.com/storytold/photocraft/releases)
 
-This repository builds the Docker image using the upstream project's Dockerfile and packaging files. The Docker packaging recipe is community-maintained upstream and may not always match the latest official web release.
+This repository builds the Docker image from the official PhotoCraft source at the selected release tag, using the Dockerfile and packaging files included in that same upstream revision. The MikaPST Release tracks that upstream version but represents the community-maintained Docker packaging, not an official PhotoCraft release.
 
 ## License and attribution
 
 PhotoCraft is dual-licensed under the **MIT License or Apache License 2.0**, at the user's option. Copyright belongs to the ArtCraft Team and PhotoCraft contributors.
 
 The upstream project includes license and attribution information for the application and bundled third-party assets. These notices and the applicable license files must be preserved when redistributing the application.
-
 - [Upstream MIT License](https://github.com/storytold/photocraft/blob/main/LICENSE-MIT)
 - [Upstream Apache License 2.0](https://github.com/storytold/photocraft/blob/main/LICENSE-APACHE)
 - [Upstream NOTICE](https://github.com/storytold/photocraft/blob/main/NOTICE)
