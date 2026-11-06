@@ -20,6 +20,9 @@
   <a href="docker-compose.yml">
     <img src="https://img.shields.io/badge/Docker%20Compose-ready-2496ED?logo=docker&logoColor=white" alt="Docker Compose configuration">
   </a>
+  <a href="https://github.com/MikaPST/photocraft-web/releases/latest">
+    <img src="https://img.shields.io/github/v/release/MikaPST/photocraft-web?label=Release&logo=github&color=blue" alt="Latest Release">
+  </a>
 </p>
 
 ---
