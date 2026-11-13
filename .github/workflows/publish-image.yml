@@ -15,7 +15,7 @@ on:
 
   schedule:
     # Check weekly for a new official PhotoCraft release.
-    - cron: "0 3 * * 1"
+    - cron: "17 3 * * *"
 
   push:
     branches:
