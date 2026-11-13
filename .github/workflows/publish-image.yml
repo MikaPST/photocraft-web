@@ -61,7 +61,7 @@ jobs:
           ls -la packaging/
 
       # --------------------------------------------------
-      # 2. Resolve upstream release
+      # 2. Resolve official upstream release
       # --------------------------------------------------
 
       - name: Resolve official PhotoCraft release
@@ -190,11 +190,11 @@ jobs:
 
           mkdir -p photocraft-src/packaging/web
 
-          cp packaging/nginx.conf \
-             photocraft-src/packaging/web/nginx.conf
+          cp "${GITHUB_WORKSPACE}/packaging/nginx.conf" \
+             "${GITHUB_WORKSPACE}/photocraft-src/packaging/web/nginx.conf"
 
-          cp packaging/.dockerignore \
-             photocraft-src/.dockerignore
+          cp "${GITHUB_WORKSPACE}/packaging/.dockerignore" \
+             "${GITHUB_WORKSPACE}/photocraft-src/.dockerignore"
 
           test -f photocraft-src/packaging/web/nginx.conf
           test -f photocraft-src/.dockerignore
@@ -263,7 +263,6 @@ jobs:
         with:
           context: ./photocraft-src
           file: ./packaging/Dockerfile
-
           platforms: linux/amd64,linux/arm64
           push: true
 
