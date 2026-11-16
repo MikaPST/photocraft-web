@@ -1,4 +1,4 @@
- <p align="center">
+<p align="center">
   <img src="https://raw.githubusercontent.com/storytold/photocraft/main/assets/app-icon/hicolor/256x256/apps/ai.storyteller.photocraft.png" width="128" height="128" alt="PhotoCraft application icon">
 </p>
 
@@ -212,22 +212,39 @@ GitHub Actions checks the official PhotoCraft repository for new published relea
 | Force rebuild | Rebuilds an already published upstream version and updates its MikaPST Release |
 | Packaging changes on `main` | Rebuilds the latest official upstream release when the workflow, Dockerfile, NGINX configuration or `.dockerignore` changes |
 
+### Published tags
+
 Each successful build publishes the following GHCR tags:
 
 - `latest` — the most recently packaged official PhotoCraft release.
 - `<upstream-version>` — the exact upstream release tag, for example `v0.20.2`.
-- `upstream-<commit>` — the exact upstream source commit used for the image.
+- `upstream-<commit>` — the first 12 characters of the upstream source commit used for the image.
 
 The build targets `linux/amd64` and `linux/arm64`. It checks out the official PhotoCraft source at the selected release tag and builds the application using the version-controlled Dockerfile and NGINX configuration maintained in this repository.
 
 The Docker build context remains the official upstream source tree, ensuring access to the Rust workspace, application source files, translations and assets required for compilation.
 
-After the image is successfully built and pushed, this repository creates or updates a GitHub Release with the same version tag. The MikaPST Release includes the upstream release notes, a link to the official release, the upstream commit, supported Docker platforms, image tags and image digest.
+### GitHub Releases
 
-The workflow is idempotent: scheduled and ordinary manual runs skip a version that already has a Release in this repository. A manual run can force a rebuild when needed. Changes pushed to the monitored packaging files trigger a rebuild of the current latest upstream release.
+After a successful Docker build and GHCR push, the workflow creates or updates a [GitHub Release](https://github.com/MikaPST/photocraft-web/releases) matching the official upstream release tag.
+
+Each release includes:
+
+- Official upstream release notes and a link to the original PhotoCraft release.
+- The upstream release tag and the 12-character source commit identifier used by the workflow.
+- Published Docker tags (`latest`, the upstream version and `upstream-<commit>`).
+- Supported architectures: `linux/amd64` and `linux/arm64`.
+- The published Docker image digest, when available.
+- An explicit notice that the image is community-maintained packaging.
+
+The Release badge at the top of this README reflects the latest published GitHub Release.
+
+Scheduled and ordinary manual runs skip upstream versions that already have a Release in this repository. To rebuild an existing version, open **Actions → Build and publish PhotoCraft Web → Run workflow** and enable `force_rebuild`. Changes to monitored packaging files on `main` also trigger a rebuild of the latest upstream release.
 
 > [!IMPORTANT]
-> A new upstream release is not published to GHCR until its Docker build and multi-platform push have succeeded. The `latest` tag is mutable; use an explicit version tag when you need to keep a deployment on a specific PhotoCraft release.
+> A GitHub Release is created or updated **only after** the multi-platform Docker image has been successfully pushed to GHCR.
+>
+> The `latest` tag is mutable. Pin a versioned image tag for a stable deployment. A forced rebuild may also replace the image behind an existing version tag.
 
 PhotoCraft is under active development. Test new images before relying on them for important work.
 
@@ -268,7 +285,7 @@ The upstream project includes license and attribution information for the applic
 
 The Docker packaging process preserves the upstream license and attribution files in the published runtime image.
 
-The licenses for the upstream application do not automatically determine the license of the packaging files maintained in this repository. Refer to the repository's own `LICENSE` file for the terms applicable to those files.
+The licenses for the upstream application do not automatically determine the license of the packaging files maintained in this repository. Refer to the repository's own `LICENSE` file, if present, for the terms applicable to those files.
 
 The PhotoCraft name, ArtCraft branding and logos remain subject to their respective trademark and usage terms. This repository is an independent community-maintained packaging project and is **not an official PhotoCraft release** and is not affiliated with or endorsed by the PhotoCraft or ArtCraft maintainers.
 
